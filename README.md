@@ -5,8 +5,8 @@ Nº | Algoritmo de ordenação
 --- | --- 
 1 | Selection sort 
 2 | Insertion sort 
-3 | Merge sort 
-4 | Quicksort 
+3 | Quicksort
+4 | Merge sort 
 5 | Heapsort 
 
 
