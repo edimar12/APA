@@ -1,80 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void heap(int a[], int n) {
+void heap(int v[], int n) {
    int i = n / 2, pai, filho, t;
    while(1) {
       if (i > 0) {
           i--;
-          t = a[i];
+          t = v[i];
       } else {
           n--;
           if (n == 0) return;
-          t = a[n];
-          a[n] = a[0];
+          t = v[n];
+          v[n] = v[0];
       }
       pai = i;
       filho = i * 2 + 1;
       while (filho < n) {
-          if ((filho + 1 < n)  &&  (a[filho + 1] > a[filho]))
+          if ((filho + 1 < n)  &&  (v[filho + 1] > v[filho]))
               filho++;
-          if (a[filho] > t) {
-             a[pai] = a[filho];
+          if (v[filho] > t) {
+             v[pai] = v[filho];
              pai = filho;
              filho = pai * 2 + 1;
           } else {
              break;
           }
       }
-      a[pai] = t;
+      v[pai] = t;
    }
 }
 
-int * insertion(int *arr, int size){
+int * insertion(int *v, int tam){
 	int i, j, key;
-	for(int i = 1; i < size; i++){
-		key = arr[i];
-		for(j = i-1; j>=0 && key < arr[j];j--){
-			arr[j+1] = arr[j];
+	for(int i = 1; i < tam; i++){
+		key = v[i];
+		for(j = i-1; j>=0 && key < v[j];j--){
+			v[j+1] = v[j];
 		}
-		arr[j+1] = key;
+		v[j+1] = key;
 	}
 }
 
-void merge(int *arr, int initial, int end) {
-    int i, j, k, halfsize, *arrTemp;
+void merge(int *v, int inicio, int fim) {
+    int i, j, k, meiotam, *vTemp;
 
-    if(initial == end) return;
+    if(inicio == fim) return;
 
-    halfsize = (initial + end ) / 2;
-    merge(arr, initial, halfsize);
-    merge(arr, halfsize + 1, end);
+    meiotam = (inicio + fim ) / 2;
+    merge(v, inicio, meiotam);
+    merge(v, meiotam + 1, fim);
 
-    i = initial;
-    j = halfsize + 1;
+    i = inicio;
+    j = meiotam + 1;
     k = 0;
-    arrTemp = (int *) malloc(sizeof(int) * (end - initial + 1));
+    vTemp = (int *) malloc(sizeof(int) * (fim - inicio + 1));
 
-    while(i < halfsize + 1 || j  < end + 1) {
-        if (i == halfsize + 1 ) { 
-            arrTemp[k] = arr[j];
+    while(i < meiotam + 1 || j  < fim + 1) {
+        if (i == meiotam + 1 ) { 
+            vTemp[k] = v[j];
             j++;
             k++;
         }
         else {
-            if (j == end + 1) { 
-                arrTemp[k] = arr[i];
+            if (j == fim + 1) { 
+                vTemp[k] = v[i];
                 i++;
                 k++;
             }
             else {
-                if (arr[i] < arr[j]) {
-                    arrTemp[k] = arr[i];
+                if (v[i] < v[j]) {
+                    vTemp[k] = v[i];
                     i++;
                     k++;
                 }
                 else {
-                    arrTemp[k] = arr[j];
+                    vTemp[k] = v[j];
                     j++;
                     k++;
                 }
@@ -83,41 +83,47 @@ void merge(int *arr, int initial, int end) {
 
     }
 
-    for(i = initial; i <= end; i++) {
-        arr[i] = arrTemp[i - initial];
+    for(i = inicio; i <= fim; i++) {
+        v[i] = vTemp[i - inicio];
     }
-    free(arrTemp);
+    free(vTemp);
 
 }
 
-void quick(int * arr, int initial, int end){
-	int i = initial, j = end, pivot, aux;
-	pivot = arr[(initial + end)/2];
+void quick(int * v, int inicio, int fim){
+	int i, j, pivo, aux;
+	i = inicio;
+	j = fim;
+	pivo = v[(inicio + fim)/2];
 	while(i<j){
-		while(arr[i] < pivot) i++;
-		while(arr[j] > pivot) j--;
+		while(v[i] < pivo) 
+			i++;
+		while(v[j] > pivo) 
+			j--;
 		if(i <= j){
-			aux = arr[i];
-			arr[i++] = arr[j];
-			arr[j--] = aux;
+			aux = v[i];
+			v[i++] = v[j];
+			v[j--] = aux;
 		}
 	}
-	if(j > initial) quick(arr, initial, j);
-	if(i < end) quick(arr, i, end);
+	if(j > inicio) 
+		quick(v, inicio, j);
+	if(i < fim) 
+		quick(v, i, fim);
 
 	return;
 }
 
-int * selection(int *arr, int size){
+int * selection(int *v, int size){
 	int i,j,y, min, aux;
 	for(i = 0; i<size-1; i++){
 		min = i;
 		for(j = i+1; j<size; j++){
-			if(arr[min] > arr[j]) min = j;
+			if(v[min] > v[j]) min = j;
 		}
-		aux = arr[min];
-		arr[min] = arr[i];
-		arr[i] = aux;
+		aux = v[min];
+		v[min] = v[i];
+		v[i] = aux;
 	}
 
 }
@@ -128,25 +134,25 @@ int main(int argc, char** argv){
 	int size,i;
 	FILE* file = fopen(argv[2], "r");
 	fscanf(file, "%d", &size);
-	int * arr = (int*) malloc(sizeof(int)*size);
+	int * v = (int*) malloc(sizeof(int)*size);
 	for(i = 0; i < size; i++)
-		fscanf(file, "%d", &arr[i]);	
+		fscanf(file, "%d", &v[i]);	
 
 	switch(atoi(argv[1])){
 		case 1: 
-			selection(arr, size);	
+			selection(v, size);	
 			break;
 		case 2:
-			insertion(arr, size);
+			insertion(v, size);
 			break;
 		case 3:
-			quick(arr, 0, size-1);
+			quick(v, 0, size-1);
 			break;
 		case 4:
-			merge(arr, 0 ,size-1);
+			merge(v, 0 ,size-1);
 			break;
 		case 5:
-			heap(arr, size);
+			heap(v, size);
 			break;
 		default:
 			printf("Numero de algoritmo invalido. Passa numero entre 1-5\n");
@@ -154,7 +160,7 @@ int main(int argc, char** argv){
 			break;			
 	}
 	
-	  for(i = 0; i<size; i++) printf("%d%s", arr[i],i != size-1 ? ", ":"\n") ;
+	  for(i = 0; i<size; i++) printf("%d%s", v[i],i != size-1 ? ", ":"\n") ;
 
 	return 0;
 }
