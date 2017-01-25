@@ -131,6 +131,7 @@ int * selection(int *v, int size){
 //1 - numero do alg
 //2 - nome do arquivo
 int main(int argc, char** argv){
+	if (argc < 1) exit(EXIT_FAILURE);
 	int size,i;
 	FILE* file = fopen(argv[2], "r");
 	fscanf(file, "%d", &size);
