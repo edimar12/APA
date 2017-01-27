@@ -133,11 +133,10 @@ int * selection(int *v, int size){
 int main(int argc, char** argv){
 	if (argc < 1) exit(EXIT_FAILURE);
 	int size,i;
-	FILE* file = fopen(argv[2], "r");
-	fscanf(file, "%d", &size);
+	scanf("%d", &size);
 	int * v = (int*) malloc(sizeof(int)*size);
 	for(i = 0; i < size; i++)
-		fscanf(file, "%d", &v[i]);	
+		scanf("%d", &v[i]);	
 
 	switch(atoi(argv[1])){
 		case 1: 
@@ -161,7 +160,7 @@ int main(int argc, char** argv){
 			break;			
 	}
 	
-	  for(i = 0; i<size; i++) printf("%d%s", v[i],i != size-1 ? ", ":"\n") ;
+	  for(i = 0; i<size; i++) printf("%d\n",v[i]);
 
 	return 0;
 }
