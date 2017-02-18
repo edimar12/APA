@@ -1,76 +1,171 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define RANGE 9999
-#define tam_bucket 1000
-#define num_bucket 1000
-
-
-typedef struct {
-        int top;
-        int balde[tam_bucket];
-}bucket;
- 
-void buckets(int v[],int tam);                         
-int cmpfunc (const void * a, const void * b); 
-                                                            
-void buckets(int v[],int tam){                                     
-        bucket b[num_bucket];                                      
-        int i,j,k;                                                 
-	for(i=0;i<num_bucket;i++){                  
-                 b[i].top=0;
-        }
-	for(i=0;i<tam;i++){                        
-                j=(num_bucket)-1;
-                while(1){
-                        if(j<0)
-                                break;
-                        if(v[i]>=j*10){
-                                b[j].balde[b[j].top]=v[i];
-                                (b[j].top)++;
-                                break;
-                        }
-                        j--;
-                }
-        }
-         
-	for(i=0;i<num_bucket;i++)                    
-                 if(b[i].top)
-			qsort(b[i].balde, b[i].top, sizeof(int), cmpfunc);
-         
-         i=0;
-	for(j=0;j<num_bucket;j++){                  
-                 for(k=0;k<b[j].top;k++){
-                         v[i]=b[j].balde[k];
-                         i++;
-                 }
-         }
- }
- int cmpfunc (const void * a, const void * b)
-{
-   return ( *(int*)a - *(int*)b );
+#define RANGE 10000
+#define RANGE_BUCKETS 1000
+#define NBUCKET 1000
+int get_max(int a[], int num_elements){
+   int i, max= a[0];
+   for (i=0; i<num_elements; i++)
+   {
+  if (a[i]>max)
+  {
+     max=a[i];
+  }
+   }
+   return(max);
+}
+int get_min(int a[], int num_elements){
+   int i, min= a[0];
+   for (i=0; i<num_elements; i++)
+   {
+  if (a[i]<min)
+  {
+     min=a[i];
+  }
+   }
+   return(min);
 }
 
-void counting(int arr[], int size){
-    
-	int output[size];
-	int count[RANGE + 1], i;
-	memset(count, 0, sizeof(count));
+
+struct Node 
+{ 
+	int data;  
+	struct Node *next; 
+};
+int getBucketIndex(int value)
+{
+	return value/RANGE_BUCKETS;
+}
+
+struct Node *insertionSort(struct Node *list)
+{	
+	struct Node *k,*nodeList;
+	if(list == 0 || list->next == 0) { 
+		return list; 
+	}
 	
-	for(i = 0; arr[i]; ++i)
+	nodeList = list; 
+	k = list->next; 
+	nodeList->next = 0; 
+	while(k != 0) {	
+		struct Node *ptr;
+
+		if(nodeList->data > k->data)  { 
+			struct Node *tmp;
+			tmp = k;  
+			k = k->next; 
+			tmp->next = nodeList;
+			nodeList = tmp; 
+			continue;
+		}
+
+		for(ptr = nodeList; ptr->next != 0; ptr = ptr->next) {
+			if(ptr->next->data > k->data) break;
+		}
+
+		if(ptr->next!=0){  
+			struct Node *tmp;
+			tmp = k;  
+			k = k->next; 
+			tmp->next = ptr->next;
+			ptr->next = tmp; 
+			continue;
+		}
+		else{
+			ptr->next = k;  
+			k = k->next;  
+			ptr->next->next = 0; 
+			continue;
+		}
+	}
+	return nodeList;
+}
+void bucket(int arr[] ,int size)
+{	
+	int i,j, min;
+	min = get_min(arr , size);
+	for(i= 0 ; i < size ; i++){
+		arr[i] = arr[i] -min; 
+	}
+	struct Node **buckets;  
+
+	
+	buckets = (struct Node **)malloc(sizeof(struct Node*) * NBUCKET); 
+
+	
+	for(i = 0; i < NBUCKET;++i) {  
+		buckets[i] = NULL;
+	}
+
+	for(i = 0; i < size; ++i) {	
+		struct Node *current;
+		int pos = getBucketIndex(arr[i]);
+		current = (struct Node *) malloc(sizeof(struct Node));
+		current->data = arr[i]; 
+		current->next = buckets[pos];  
+		buckets[pos] = current;
+	}
+
+	for(i = 0; i < NBUCKET; ++i) {  
+		buckets[i] = insertionSort(buckets[i]); 
+	}
+
+	
+	for(j =0, i = 0; i < NBUCKET; ++i) {	
+		struct Node *node;
+		node = buckets[i];
+		while(node) {
+			arr[j++] = node->data + min;
+			node = node->next;
+		}
+	}
+	
+	for(i = 0; i < NBUCKET;++i) {	
+		struct Node *node;
+		node = buckets[i];
+		while(node) {
+			struct Node *tmp;
+			tmp = node; 
+			node = node->next; 
+			free(tmp);
+		}
+	}
+	free(buckets); 
+	return;
+}
+
+
+void counting(int arr[], int size , int range){
+	int min ;
+
+	min = get_min(arr, size);
+
+	int output[size];
+	int i;
+	int count[range + 1];
+
+	for(i = 0 ; i <size ; i++)
+		arr[i] = arr[i] - min ;
+	memset(count, 0, sizeof(count));
+
+
+	for(i = 0; i< size; ++i)
 		++count[arr[i]];
 
-	for (i = 1; i <= RANGE; ++i)
+	for (i = 1; i <= range; ++i)
 		count[i] += count[i-1];
 
-	for (i = 0; arr[i]; ++i){
+	for (i = 0; i < size; ++i){
         	output[count[arr[i]]-1] = arr[i];
         	--count[arr[i]];
     	}
-
-	for (i = 0; arr[i]; ++i)
-        	arr[i] = output[i];
+  
+	for (i = 0; i<size; ++i){
+        	arr[i] = output[i]+ min;
+	}
 }
+
 void radix(int v[], int size) {
     int i;
     int *b;
@@ -108,17 +203,19 @@ void radix(int v[], int size) {
 //2 - nome do arquivo
 int main(int argc, char** argv){
 	if (argc < 1) exit(EXIT_FAILURE);
-	int size,i;
+	int size,i , range ;
 	scanf("%d", &size);
 	int * v = (int*) malloc(sizeof(int)*size);
 	for(i = 0; i < size; i++)
-		scanf("%d", &v[i]);	
+		scanf("%d", &v[i]);
+	
 	switch(atoi(argv[1])){
 		case 1: 
-			counting(v, size);	
+			range = get_max(v , size) - get_min(v, size);
+			counting(v, size, range);	
 			break;
 		case 2:
-			buckets(v, size);
+			bucket(v, size);
 			
 			break;
 		case 3:
