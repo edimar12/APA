@@ -30,12 +30,12 @@ int get_min(int a[], int num_elements){
 
 struct Node 
 { 
-	int data;  
+	int valor;  
 	struct Node *next; 
 };
-int getBucketIndex(int value)
+int getBucketIndex(int valor)
 {
-	return value/RANGE_BUCKETS;
+	return valor/RANGE_BUCKETS;
 }
 
 struct Node *insertionSort(struct Node *list)
@@ -51,7 +51,7 @@ struct Node *insertionSort(struct Node *list)
 	while(k != 0) {	
 		struct Node *ptr;
 
-		if(nodeList->data > k->data)  { 
+		if(nodeList->valor > k->valor)  { 
 			struct Node *tmp;
 			tmp = k;  
 			k = k->next; 
@@ -61,7 +61,7 @@ struct Node *insertionSort(struct Node *list)
 		}
 
 		for(ptr = nodeList; ptr->next != 0; ptr = ptr->next) {
-			if(ptr->next->data > k->data) break;
+			if(ptr->next->valor > k->valor) break;
 		}
 
 		if(ptr->next!=0){  
@@ -102,7 +102,7 @@ void bucket(int arr[] ,int size)
 		struct Node *current;
 		int pos = getBucketIndex(arr[i]);
 		current = (struct Node *) malloc(sizeof(struct Node));
-		current->data = arr[i]; 
+		current->valor = arr[i]; 
 		current->next = buckets[pos];  
 		buckets[pos] = current;
 	}
@@ -116,7 +116,7 @@ void bucket(int arr[] ,int size)
 		struct Node *node;
 		node = buckets[i];
 		while(node) {
-			arr[j++] = node->data + min;
+			arr[j++] = node->valor + min;
 			node = node->next;
 		}
 	}
@@ -169,16 +169,11 @@ void counting(int arr[], int size , int range){
 void radix(int v[], int size) {
     int i;
     int *b;
-    int maior = v[0];
+    int maior = get_max(v,size);
     int exp = 1;
 
     b = (int *)calloc(size, sizeof(int));
 
-    for (i = 0; i < size; i++) {
-        if (v[i] > maior)
-    	    maior = v[i];
-    }
- 
     while (maior/exp > 0) {
         int bucket[RANGE] = { 0 };
     	for (i = 0; i < size; i++)
